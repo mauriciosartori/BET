@@ -2,6 +2,12 @@
 
 Brick is a native Android application for exploring earthquakes reported by the [USGS Earthquake API](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php). It presents the same recent activity as a list and on a map, provides an event detail view, supports manual refresh, and keeps previously loaded earthquake data available when a network request fails.
 
+## Screenshots
+
+| Earthquake list | Event details | Clustered map |
+| --- | --- | --- |
+| <img src="docs/screenshots/earthquake-list.png" alt="Earthquake list with magnitude colors and sorting controls" width="240"> | <img src="docs/screenshots/earthquake-detail.png" alt="Earthquake details with magnitude, map, and geographic coordinates" width="240"> | <img src="docs/screenshots/earthquake-map.png" alt="Earthquake map with clustered markers and current location" width="240"> |
+
 ## Features
 
 - Recent worldwide earthquakes from the USGS all-day GeoJSON feed.
