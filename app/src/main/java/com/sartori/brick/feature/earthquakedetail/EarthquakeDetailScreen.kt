@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,8 @@ import com.sartori.brick.R
 import com.sartori.brick.data.earthquake.Earthquake
 import com.sartori.brick.feature.earthquakelist.formatEarthquakeTime
 import com.sartori.brick.feature.earthquakelist.magnitudeColor
+import com.sartori.brick.feature.earthquakemap.EarthquakeMarkerBadge
+import com.sartori.brick.feature.earthquakemap.rememberEarthquakeMapStyle
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,11 +122,21 @@ private fun EarthquakeMap(earthquake: Earthquake) {
     val camera = rememberCameraPositionState {
         this.position = CameraPosition.fromLatLngZoom(position, 5f)
     }
+    val mapStyle = rememberEarthquakeMapStyle()
     GoogleMap(
         modifier = Modifier.fillMaxWidth().height(220.dp).clip(MaterialTheme.shapes.medium),
         cameraPositionState = camera,
+        properties = MapProperties(mapStyleOptions = mapStyle),
         uiSettings = MapUiSettings(scrollGesturesEnabled = false, mapToolbarEnabled = false)
     ) {
-        Marker(state = rememberUpdatedMarkerState(position = position), title = earthquake.place)
+        MarkerComposable(
+            earthquake.id,
+            earthquake.magnitude ?: Double.NaN,
+            state = rememberUpdatedMarkerState(position = position),
+            anchor = Offset(0.5f, 0.5f),
+            title = earthquake.place
+        ) {
+            EarthquakeMarkerBadge(earthquake.magnitude)
+        }
     }
 }

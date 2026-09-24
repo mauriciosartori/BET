@@ -31,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -116,6 +117,7 @@ private fun EarthquakeMarkers(events: List<Earthquake>, onEarthquakeClick: (Stri
     }
     val items = remember(events) { events.map { EarthquakeClusterItem(it) } }
     val scope = rememberCoroutineScope()
+    val mapStyle = rememberEarthquakeMapStyle()
 
     LaunchedEffect(Unit) {
         if (!hasLocationPermission && !permissionRequested) {
@@ -132,7 +134,10 @@ private fun EarthquakeMarkers(events: List<Earthquake>, onEarthquakeClick: (Stri
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = camera,
-        properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
+        properties = MapProperties(
+            isMyLocationEnabled = hasLocationPermission,
+            mapStyleOptions = mapStyle
+        ),
         uiSettings = MapUiSettings(
             mapToolbarEnabled = false,
             myLocationButtonEnabled = hasLocationPermission
@@ -140,6 +145,26 @@ private fun EarthquakeMarkers(events: List<Earthquake>, onEarthquakeClick: (Stri
     ) {
         Clustering(
             items = items,
+            clusterContentAnchor = Offset(0.5f, 0.5f),
+            clusterItemContentAnchor = Offset(0.5f, 0.5f),
+            clusterContent = { cluster ->
+                val strongestMagnitude = cluster.items.maxOfOrNull {
+                    it.earthquake.magnitude ?: Double.NEGATIVE_INFINITY
+                }?.takeUnless { it == Double.NEGATIVE_INFINITY }
+                val clusterSize = when {
+                    cluster.size >= 100 -> 54.dp
+                    cluster.size >= 10 -> 48.dp
+                    else -> 42.dp
+                }
+                EarthquakeMarkerBadge(
+                    magnitude = strongestMagnitude,
+                    label = cluster.size.toString(),
+                    size = clusterSize
+                )
+            },
+            clusterItemContent = { item ->
+                EarthquakeMarkerBadge(item.earthquake.magnitude)
+            },
             onClusterClick = { cluster ->
                 scope.launch {
                     camera.animate(

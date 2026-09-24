@@ -40,10 +40,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sartori.brick.R
 import com.sartori.brick.data.earthquake.Earthquake
 import com.sartori.brick.ui.theme.BrickTheme
-import com.sartori.brick.ui.theme.MagnitudeGreen
-import com.sartori.brick.ui.theme.MagnitudeOrange
-import com.sartori.brick.ui.theme.MagnitudeRed
-import com.sartori.brick.ui.theme.MagnitudeYellow
+import com.sartori.brick.ui.theme.MagnitudeLow
+import com.sartori.brick.ui.theme.MagnitudeModerate
+import com.sartori.brick.ui.theme.MagnitudeSevere
+import com.sartori.brick.ui.theme.MagnitudeStrong
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -284,10 +284,10 @@ private fun EarthquakeListItem(earthquake: Earthquake, onClick: () -> Unit) {
 @Composable
 internal fun magnitudeColor(magnitude: Double?) = when (magnitudeLevel(magnitude)) {
     MagnitudeLevel.UNKNOWN -> MaterialTheme.colorScheme.outline
-    MagnitudeLevel.GREEN -> MagnitudeGreen
-    MagnitudeLevel.YELLOW -> MagnitudeYellow
-    MagnitudeLevel.ORANGE -> MagnitudeOrange
-    MagnitudeLevel.RED -> MagnitudeRed
+    MagnitudeLevel.GREEN -> MagnitudeLow
+    MagnitudeLevel.YELLOW -> MagnitudeModerate
+    MagnitudeLevel.ORANGE -> MagnitudeStrong
+    MagnitudeLevel.RED -> MagnitudeSevere
 }
 
 internal fun magnitudeLevel(magnitude: Double?): MagnitudeLevel = when {
