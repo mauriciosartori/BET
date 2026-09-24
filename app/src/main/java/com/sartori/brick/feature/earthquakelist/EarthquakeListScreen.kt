@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +62,7 @@ fun EarthquakeListScreen(
     EarthquakeListContent(
         uiState = uiState,
         onRefresh = viewModel::refresh,
+        onSortOptionSelected = viewModel::selectSortOption,
         onEarthquakeClick = onEarthquakeClick,
         onMapClick = onMapClick
     )
@@ -71,6 +73,7 @@ fun EarthquakeListScreen(
 private fun EarthquakeListContent(
     uiState: EarthquakeListUiState,
     onRefresh: () -> Unit,
+    onSortOptionSelected: (EarthquakeSortOption) -> Unit = {},
     onEarthquakeClick: (String) -> Unit = {},
     onMapClick: () -> Unit = {}
 ) {
@@ -84,7 +87,8 @@ private fun EarthquakeListContent(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_map),
-                            contentDescription = stringResource(R.string.earthquake_map)
+                            contentDescription = stringResource(R.string.earthquake_map),
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -111,6 +115,7 @@ private fun EarthquakeListContent(
             else -> EarthquakeList(
                 uiState = uiState,
                 onRefresh = onRefresh,
+                onSortOptionSelected = onSortOptionSelected,
                 onEarthquakeClick = onEarthquakeClick,
                 modifier = Modifier.padding(innerPadding)
             )
@@ -155,6 +160,7 @@ private fun MessageContent(
 private fun EarthquakeList(
     uiState: EarthquakeListUiState,
     onRefresh: () -> Unit,
+    onSortOptionSelected: (EarthquakeSortOption) -> Unit,
     onEarthquakeClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -184,19 +190,46 @@ private fun EarthquakeList(
             }
 
             item {
-                Text(
-                    text = stringResource(R.string.earthquake_count, uiState.earthquakes.size),
-                    style = MaterialTheme.typography.labelLarge
+                SortControls(
+                    selectedOption = uiState.sortOption,
+                    onOptionSelected = onSortOptionSelected
                 )
             }
 
             items(
-                items = uiState.earthquakes,
+                items = uiState.earthquakes.sortedFor(uiState.sortOption),
                 key = Earthquake::id
             ) { earthquake ->
                 EarthquakeListItem(earthquake, onClick = { onEarthquakeClick(earthquake.id) })
             }
         }
+    }
+}
+
+@Composable
+private fun SortControls(
+    selectedOption: EarthquakeSortOption,
+    onOptionSelected: (EarthquakeSortOption) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.sort_by),
+            style = MaterialTheme.typography.labelLarge
+        )
+        FilterChip(
+            selected = selectedOption == EarthquakeSortOption.LATEST,
+            onClick = { onOptionSelected(EarthquakeSortOption.LATEST) },
+            label = { Text(stringResource(R.string.sort_latest)) }
+        )
+        FilterChip(
+            selected = selectedOption == EarthquakeSortOption.STRONGEST,
+            onClick = { onOptionSelected(EarthquakeSortOption.STRONGEST) },
+            label = { Text(stringResource(R.string.sort_strongest)) }
+        )
     }
 }
 
@@ -352,6 +385,22 @@ internal enum class MagnitudeLevel {
     YELLOW,
     ORANGE,
     RED
+}
+
+internal fun List<Earthquake>.sortedFor(
+    sortOption: EarthquakeSortOption
+): List<Earthquake> = when (sortOption) {
+    EarthquakeSortOption.LATEST ->
+        sortedByDescending { earthquake -> earthquake.timeMillis ?: Long.MIN_VALUE }
+
+    EarthquakeSortOption.STRONGEST ->
+        sortedWith(
+            compareByDescending<Earthquake> { earthquake ->
+                earthquake.magnitude ?: Double.NEGATIVE_INFINITY
+            }.thenByDescending { earthquake ->
+                earthquake.timeMillis ?: Long.MIN_VALUE
+            }
+        )
 }
 
 internal fun formatEarthquakeTime(timeMillis: Long): String =

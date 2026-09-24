@@ -2,7 +2,9 @@
     <string name="app_name">Brick</string>
     <string name="earthquake_list_title">Brick Earthquakes Tracker</string>
     <string name="retry">Try again</string>
-    <string name="earthquake_count">%1$d earthquakes</string>
+    <string name="sort_by">Sort by</string>
+    <string name="sort_latest">Latest</string>
+    <string name="sort_strongest">Strongest</string>
     <string name="offline_data_message">Showing offline data. Some information may be out of date.</string>
     <string name="refresh_failed_message">Couldn’t refresh. Showing the previous results.</string>
     <string name="earthquake_empty_message">No recent earthquakes were found.</string>

@@ -29,6 +29,12 @@ class EarthquakeListViewModel @Inject constructor(
         loadEarthquakes(forceRefresh = true)
     }
 
+    fun selectSortOption(sortOption: EarthquakeSortOption) {
+        _uiState.update { currentState ->
+            currentState.copy(sortOption = sortOption)
+        }
+    }
+
     private fun loadEarthquakes(forceRefresh: Boolean) {
         if (loadJob?.isActive == true) return
 
@@ -51,12 +57,15 @@ class EarthquakeListViewModel @Inject constructor(
 
             try {
                 val feed = repository.getEarthquakes(forceRefresh)
-                _uiState.value = EarthquakeListUiState(
-                    earthquakes = feed.earthquakes,
-                    isInitialLoading = false,
-                    isRefreshing = false,
-                    isFromOfflineCache = feed.isFromOfflineCache
-                )
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        earthquakes = feed.earthquakes,
+                        isInitialLoading = false,
+                        isRefreshing = false,
+                        isFromOfflineCache = feed.isFromOfflineCache,
+                        error = null
+                    )
+                }
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
                 _uiState.update { currentState ->

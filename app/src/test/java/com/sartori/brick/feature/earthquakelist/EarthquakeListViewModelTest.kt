@@ -52,6 +52,19 @@ class EarthquakeListViewModelTest {
         assertEquals(EarthquakeListError.REFRESH_FAILED, viewModel.uiState.value.error)
     }
 
+    @Test
+    fun `selected sort option survives refresh`() = runTest {
+        val repository = FakeEarthquakeRepository(Result.success(TEST_FEED))
+        val viewModel = EarthquakeListViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.selectSortOption(EarthquakeSortOption.STRONGEST)
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        assertEquals(EarthquakeSortOption.STRONGEST, viewModel.uiState.value.sortOption)
+    }
+
     private class FakeEarthquakeRepository(
         var result: Result<EarthquakeFeed>
     ) : EarthquakeRepository {
