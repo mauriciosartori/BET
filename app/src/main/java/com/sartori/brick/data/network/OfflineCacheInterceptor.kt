@@ -21,7 +21,7 @@ class OfflineCacheInterceptor @Inject constructor() : Interceptor {
                         .build()
                 )
                 .build()
-            
+
             chain.proceed(cachedRequest)
         }
     }
