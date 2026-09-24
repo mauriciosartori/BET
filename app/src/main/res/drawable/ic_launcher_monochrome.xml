@@ -4,18 +4,14 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Map pin with an open center that exposes the brand-blue background. -->
     <path
-        android:fillColor="#F8F8F6"
+        android:fillColor="#FF000000"
         android:fillType="evenOdd"
         android:pathData="M54,23 C38.5,23 27,34.7 27,49.8 C27,66.1 45.8,79.7 54,87 C62.2,79.7 81,66.1 81,49.8 C81,34.7 69.5,23 54,23 Z M54,33 C63.4,33 71,40.6 71,50 C71,59.4 63.4,67 54,67 C44.6,67 37,59.4 37,50 C37,40.6 44.6,33 54,33 Z" />
-
-    <!-- A bold seismic pulse remains legible at launcher-icon sizes. -->
     <path
         android:fillColor="@android:color/transparent"
         android:pathData="M39,51 L44,51 L47.5,45 L51,58 L55,40 L59,60 L63,48 L66.5,51 L69,51"
-        android:strokeColor="#D0B068"
+        android:strokeColor="#FF000000"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:strokeWidth="3.5" />
