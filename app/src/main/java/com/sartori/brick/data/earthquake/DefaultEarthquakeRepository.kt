@@ -34,7 +34,9 @@ class DefaultEarthquakeRepository @Inject constructor(
         longitude = geometry.coordinates.getOrNull(LONGITUDE_INDEX),
         latitude = geometry.coordinates.getOrNull(LATITUDE_INDEX),
         depthKilometers = geometry.coordinates.getOrNull(DEPTH_INDEX),
-        detailsUrl = properties.detail ?: properties.url
+        detailsUrl = properties.detail ?: properties.url,
+        alert = properties.alert,
+        hasTsunamiRisk = properties.tsunami == TSUNAMI_WARNING
     )
 
     private companion object {
@@ -42,5 +44,6 @@ class DefaultEarthquakeRepository @Inject constructor(
         const val LONGITUDE_INDEX = 0
         const val LATITUDE_INDEX = 1
         const val DEPTH_INDEX = 2
+        const val TSUNAMI_WARNING = 1
     }
 }

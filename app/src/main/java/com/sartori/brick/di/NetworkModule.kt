@@ -1,6 +1,7 @@
 package com.sartori.brick.di
 
 import android.content.Context
+import com.sartori.brick.data.earthquake.network.EarthquakeApi
 import com.sartori.brick.data.network.OfflineCacheInterceptor
 import dagger.Module
 import dagger.Provides
@@ -52,6 +53,11 @@ object NetworkModule {
         .client(okHttpClient)
         .addConverterFactory(json.asConverterFactory(JSON_MEDIA_TYPE.toMediaType()))
         .build()
+
+    @Provides
+    @Singleton
+    fun provideEarthquakeApi(retrofit: Retrofit): EarthquakeApi =
+        retrofit.create(EarthquakeApi::class.java)
 
     private const val BASE_URL = "https://earthquake.usgs.gov/"
     private const val JSON_MEDIA_TYPE = "application/json"

@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">Brick</string>
-    <string name="earthquake_list_title">Recent earthquakes</string>
-    <string name="refresh">Refresh</string>
+    <string name="earthquake_list_title">Brick Earthquakes Tracker</string>
     <string name="retry">Try again</string>
     <string name="earthquake_count">%1$d earthquakes</string>
     <string name="offline_data_message">Showing saved data. Some information may be out of date.</string>
+    <string name="refresh_failed_message">Couldn’t refresh. Showing the previous results.</string>
     <string name="earthquake_empty_message">No recent earthquakes were found.</string>
     <string name="earthquake_error_message">We couldn’t load the earthquakes. Check your connection and try again.</string>
     <string name="unknown_location">Unknown location</string>
+    <string name="map_view_coming_soon">Map view coming soon</string>
 </resources>

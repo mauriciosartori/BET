@@ -8,7 +8,9 @@ data class Earthquake(
     val longitude: Double?,
     val latitude: Double?,
     val depthKilometers: Double?,
-    val detailsUrl: String?
+    val detailsUrl: String?,
+    val alert: String? = null,
+    val hasTsunamiRisk: Boolean = false
 )
 
 data class EarthquakeFeed(

@@ -20,7 +20,9 @@ data class EarthquakePropertiesDto(
     val place: String? = null,
     val time: Long? = null,
     val url: String? = null,
-    val detail: String? = null
+    val detail: String? = null,
+    val alert: String? = null,
+    val tsunami: Int = 0
 )
 
 @Serializable
