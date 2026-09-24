@@ -51,12 +51,14 @@ import java.time.format.FormatStyle
 
 @Composable
 fun EarthquakeListScreen(
-    viewModel: EarthquakeListViewModel = viewModel()
+    viewModel: EarthquakeListViewModel = viewModel(),
+    onEarthquakeClick: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     EarthquakeListContent(
         uiState = uiState,
-        onRefresh = viewModel::refresh
+        onRefresh = viewModel::refresh,
+        onEarthquakeClick = onEarthquakeClick
     )
 }
 
@@ -64,7 +66,8 @@ fun EarthquakeListScreen(
 @Composable
 private fun EarthquakeListContent(
     uiState: EarthquakeListUiState,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onEarthquakeClick: (String) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -104,6 +107,7 @@ private fun EarthquakeListContent(
             else -> EarthquakeList(
                 uiState = uiState,
                 onRefresh = onRefresh,
+                onEarthquakeClick = onEarthquakeClick,
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -147,6 +151,7 @@ private fun MessageContent(
 private fun EarthquakeList(
     uiState: EarthquakeListUiState,
     onRefresh: () -> Unit,
+    onEarthquakeClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     PullToRefreshBox(
@@ -182,7 +187,7 @@ private fun EarthquakeList(
                 items = uiState.earthquakes,
                 key = Earthquake::id
             ) { earthquake ->
-                EarthquakeListItem(earthquake)
+                EarthquakeListItem(earthquake, onClick = { onEarthquakeClick(earthquake.id) })
             }
         }
     }
@@ -203,7 +208,7 @@ private fun StatusMessage(text: String) {
 }
 
 @Composable
-private fun EarthquakeListItem(earthquake: Earthquake) {
+private fun EarthquakeListItem(earthquake: Earthquake, onClick: () -> Unit) {
     val location = splitLocation(earthquake.place)
     val cardColors = if (earthquake.hasTsunamiRisk) {
         CardDefaults.cardColors(
@@ -220,6 +225,7 @@ private fun EarthquakeListItem(earthquake: Earthquake) {
     }
 
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = cardColors
     ) {
@@ -274,7 +280,7 @@ private fun EarthquakeListItem(earthquake: Earthquake) {
 }
 
 @Composable
-private fun magnitudeColor(magnitude: Double?) = when (magnitudeLevel(magnitude)) {
+internal fun magnitudeColor(magnitude: Double?) = when (magnitudeLevel(magnitude)) {
     MagnitudeLevel.UNKNOWN -> MaterialTheme.colorScheme.outline
     MagnitudeLevel.GREEN -> MagnitudeGreen
     MagnitudeLevel.YELLOW -> MagnitudeYellow
@@ -316,7 +322,7 @@ internal enum class MagnitudeLevel {
     RED
 }
 
-private fun formatEarthquakeTime(timeMillis: Long): String =
+internal fun formatEarthquakeTime(timeMillis: Long): String =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
         .format(Instant.ofEpochMilli(timeMillis).atZone(ZoneId.systemDefault()))
 

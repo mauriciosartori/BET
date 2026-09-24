@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.sartori.brick.feature.earthquakelist.EarthquakeListScreen
+import com.sartori.brick.navigation.EarthquakeNavHost
 import com.sartori.brick.ui.theme.BrickTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BrickTheme {
-                EarthquakeListScreen()
+                EarthquakeNavHost()
             }
         }
     }

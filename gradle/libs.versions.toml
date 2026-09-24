@@ -17,8 +17,10 @@ kotlinxCoroutines = "1.11.0"
 mapsCompose = "8.3.1"
 playServicesLocation = "21.4.0"
 coil = "3.4.0"
+navigation = "2.9.8"
 
 [libraries]
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
