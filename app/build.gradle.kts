@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
     implementation(libs.okhttp)
     implementation(libs.play.services.location)
     implementation(libs.retrofit)

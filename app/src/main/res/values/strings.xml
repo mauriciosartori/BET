@@ -8,7 +8,10 @@
     <string name="earthquake_empty_message">No recent earthquakes were found.</string>
     <string name="earthquake_error_message">We couldn’t load the earthquakes. Check your connection and try again.</string>
     <string name="unknown_location">Unknown location</string>
-    <string name="map_view_coming_soon">Map view coming soon</string>
+    <string name="earthquake_map">Earthquake map</string>
+    <string name="map_screen_unavailable">Map unavailable. Return to the list to explore earthquakes.</string>
+    <string name="map_no_coordinates">No earthquakes with valid coordinates to display.</string>
+    <string name="map_missing_coordinates">Some earthquakes have no valid coordinates and cannot be shown.</string>
     <string name="earthquake_details">Earthquake details</string>
     <string name="back">Back</string>
     <string name="detail_unavailable">This earthquake is no longer available in the current feed. Try again or return to the list.</string>

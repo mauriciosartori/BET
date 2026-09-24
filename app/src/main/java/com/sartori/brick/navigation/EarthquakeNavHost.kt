@@ -11,10 +11,14 @@ import androidx.navigation.toRoute
 import com.sartori.brick.feature.earthquakedetail.EarthquakeDetailScreen
 import com.sartori.brick.feature.earthquakelist.EarthquakeListScreen
 import com.sartori.brick.feature.earthquakelist.EarthquakeListViewModel
+import com.sartori.brick.feature.earthquakemap.EarthquakeMapScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
 internal data object EarthquakeListRoute
+
+@Serializable
+internal data object EarthquakeMapRoute
 
 @Serializable
 internal data class EarthquakeDetailRoute(val earthquakeId: String)
@@ -22,15 +26,29 @@ internal data class EarthquakeDetailRoute(val earthquakeId: String)
 @Composable
 fun EarthquakeNavHost(viewModel: EarthquakeListViewModel = viewModel()) {
     val navController = rememberNavController()
-    // Created above the destinations so both screens share the same feed.
+    // Created above the destinations so all screens share the same feed.
     NavHost(navController = navController, startDestination = EarthquakeListRoute) {
         composable<EarthquakeListRoute> {
             EarthquakeListScreen(
                 viewModel = viewModel,
+                onMapClick = {
+                    navController.navigate(EarthquakeMapRoute) { launchSingleTop = true }
+                },
                 onEarthquakeClick = { id ->
                     navController.navigate(EarthquakeDetailRoute(id)) {
                         launchSingleTop = true
                     }
+                }
+            )
+        }
+        composable<EarthquakeMapRoute> {
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            EarthquakeMapScreen(
+                uiState = state,
+                onBack = { navController.popBackStack() },
+                onRetry = viewModel::refresh,
+                onEarthquakeClick = { id ->
+                    navController.navigate(EarthquakeDetailRoute(id)) { launchSingleTop = true }
                 }
             )
         }

@@ -52,13 +52,15 @@ import java.time.format.FormatStyle
 @Composable
 fun EarthquakeListScreen(
     viewModel: EarthquakeListViewModel = viewModel(),
-    onEarthquakeClick: (String) -> Unit = {}
+    onEarthquakeClick: (String) -> Unit = {},
+    onMapClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     EarthquakeListContent(
         uiState = uiState,
         onRefresh = viewModel::refresh,
-        onEarthquakeClick = onEarthquakeClick
+        onEarthquakeClick = onEarthquakeClick,
+        onMapClick = onMapClick
     )
 }
 
@@ -67,7 +69,8 @@ fun EarthquakeListScreen(
 private fun EarthquakeListContent(
     uiState: EarthquakeListUiState,
     onRefresh: () -> Unit,
-    onEarthquakeClick: (String) -> Unit = {}
+    onEarthquakeClick: (String) -> Unit = {},
+    onMapClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -75,12 +78,11 @@ private fun EarthquakeListContent(
                 title = { Text(stringResource(R.string.earthquake_list_title)) },
                 actions = {
                     IconButton(
-                        onClick = {},
-                        enabled = false
+                        onClick = onMapClick
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_map),
-                            contentDescription = stringResource(R.string.map_view_coming_soon)
+                            contentDescription = stringResource(R.string.earthquake_map)
                         )
                     }
                 }
