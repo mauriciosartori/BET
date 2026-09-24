@@ -1,5 +1,7 @@
 package com.sartori.brick.feature.earthquakedetail
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,10 +9,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -81,19 +87,7 @@ fun EarthquakeDetailScreen(
                     fontWeight = FontWeight.Bold
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(Modifier.size(24.dp).background(magnitudeColor(earthquake.magnitude), CircleShape))
-                    Column {
-                        Text(stringResource(R.string.magnitude), style = MaterialTheme.typography.labelLarge)
-                        Text(
-                            earthquake.magnitude?.let { String.format(Locale.getDefault(), "%.1f", it) } ?: "—",
-                            style = MaterialTheme.typography.displaySmall
-                        )
-                    }
-                }
+                EarthquakeMagnitude(earthquake)
 
                 DetailField(
                     stringResource(R.string.event_time),
@@ -108,6 +102,48 @@ fun EarthquakeDetailScreen(
         }
     }
 }
+
+@Composable
+private fun EarthquakeMagnitude(earthquake: Earthquake) {
+    val shakeProgress = remember(earthquake.id) { Animatable(0f) }
+    val shakeDistance = with(LocalDensity.current) { 8.dp.toPx() }
+
+    LaunchedEffect(earthquake.id) {
+        if (shouldShakeMagnitude(earthquake.magnitude)) {
+            repeat(3) {
+                shakeProgress.animateTo(-1f, tween(durationMillis = 50))
+                shakeProgress.animateTo(1f, tween(durationMillis = 100))
+            }
+            shakeProgress.animateTo(0f, tween(durationMillis = 50))
+        }
+    }
+
+    Row(
+        modifier = Modifier.graphicsLayer {
+            translationX = shakeProgress.value * shakeDistance
+        },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            Modifier
+                .size(24.dp)
+                .background(magnitudeColor(earthquake.magnitude), CircleShape)
+        )
+        Column {
+            Text(stringResource(R.string.magnitude), style = MaterialTheme.typography.labelLarge)
+            Text(
+                earthquake.magnitude?.let {
+                    String.format(Locale.getDefault(), "%.1f", it)
+                } ?: "—",
+                style = MaterialTheme.typography.displaySmall
+            )
+        }
+    }
+}
+
+internal fun shouldShakeMagnitude(magnitude: Double?): Boolean =
+    magnitude != null && magnitude >= 4.5
 
 @Composable
 private fun EventDataSection(earthquake: Earthquake) {
