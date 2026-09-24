@@ -16,7 +16,8 @@
     <string name="back">Back</string>
     <string name="detail_unavailable">This earthquake is no longer available in the current feed. Try again or return to the list.</string>
     <string name="magnitude">Magnitude</string>
-    <string name="event_time">Date and time (local)</string>
+    <string name="event_time">Local date &amp; time</string>
+    <string name="event_data">Event data</string>
     <string name="depth">Depth</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
