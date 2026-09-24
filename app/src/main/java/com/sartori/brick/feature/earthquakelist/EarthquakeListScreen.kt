@@ -1,6 +1,7 @@
 package com.sartori.brick.feature.earthquakelist
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sartori.brick.R
 import com.sartori.brick.data.earthquake.Earthquake
 import com.sartori.brick.ui.theme.BrickTheme
+import com.sartori.brick.ui.theme.BrandOchre
 import com.sartori.brick.ui.theme.MagnitudeLow
 import com.sartori.brick.ui.theme.MagnitudeModerate
 import com.sartori.brick.ui.theme.MagnitudeSevere
@@ -168,7 +170,10 @@ private fun EarthquakeList(
         ) {
             if (uiState.isFromOfflineCache) {
                 item {
-                    StatusMessage(text = stringResource(R.string.offline_data_message))
+                    StatusMessage(
+                        text = stringResource(R.string.offline_data_message),
+                        tone = StatusMessageTone.OFFLINE
+                    )
                 }
             }
 
@@ -196,10 +201,22 @@ private fun EarthquakeList(
 }
 
 @Composable
-private fun StatusMessage(text: String) {
+private fun StatusMessage(
+    text: String,
+    tone: StatusMessageTone = StatusMessageTone.INFO
+) {
+    val containerColor = when (tone) {
+        StatusMessageTone.INFO -> MaterialTheme.colorScheme.secondaryContainer
+        StatusMessageTone.OFFLINE -> MaterialTheme.colorScheme.tertiaryContainer
+    }
+    val borderColor = when (tone) {
+        StatusMessageTone.INFO -> MaterialTheme.colorScheme.secondary
+        StatusMessageTone.OFFLINE -> BrandOchre
+    }
     Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        shape = MaterialTheme.shapes.medium
+        color = containerColor,
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(1.dp, borderColor.copy(alpha = 0.55f))
     ) {
         Text(
             text = text,
@@ -229,7 +246,15 @@ private fun EarthquakeListItem(earthquake: Earthquake, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = cardColors
+        colors = cardColors,
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (earthquake.hasTsunamiRisk) {
+                MaterialTheme.colorScheme.error.copy(alpha = 0.65f)
+            } else {
+                MaterialTheme.colorScheme.secondary.copy(alpha = 0.28f)
+            }
+        )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -279,6 +304,11 @@ private fun EarthquakeListItem(earthquake: Earthquake, onClick: () -> Unit) {
             }
         }
     }
+}
+
+private enum class StatusMessageTone {
+    INFO,
+    OFFLINE
 }
 
 @Composable

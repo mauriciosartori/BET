@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,7 @@ import com.sartori.brick.R
 import com.sartori.brick.data.earthquake.Earthquake
 import com.sartori.brick.feature.earthquakelist.EarthquakeListError
 import com.sartori.brick.feature.earthquakelist.EarthquakeListUiState
+import com.sartori.brick.ui.theme.BrandOchre
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +92,12 @@ fun EarthquakeMapScreen(
                         Modifier.align(Alignment.TopCenter).padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if (uiState.isFromOfflineCache) MapNotice(stringResource(R.string.offline_data_message))
+                        if (uiState.isFromOfflineCache) {
+                            MapNotice(
+                                message = stringResource(R.string.offline_data_message),
+                                tone = MapNoticeTone.OFFLINE
+                            )
+                        }
                         if (events.size != uiState.earthquakes.size) MapNotice(stringResource(R.string.map_missing_coordinates))
                     }
                 }
@@ -185,10 +192,31 @@ private fun EarthquakeMarkers(events: List<Earthquake>, onEarthquakeClick: (Stri
 }
 
 @Composable
-private fun MapNotice(message: String) {
-    Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.secondaryContainer) {
+private fun MapNotice(
+    message: String,
+    tone: MapNoticeTone = MapNoticeTone.INFO
+) {
+    val containerColor = when (tone) {
+        MapNoticeTone.INFO -> MaterialTheme.colorScheme.secondaryContainer
+        MapNoticeTone.OFFLINE -> MaterialTheme.colorScheme.tertiaryContainer
+    }
+    val borderColor = when (tone) {
+        MapNoticeTone.INFO -> MaterialTheme.colorScheme.secondary
+        MapNoticeTone.OFFLINE -> BrandOchre
+    }
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = containerColor,
+        border = BorderStroke(1.dp, borderColor.copy(alpha = 0.55f))
+    ) {
         Text(message, Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium)
     }
+}
+
+private enum class MapNoticeTone {
+    INFO,
+    OFFLINE
 }
 
 internal fun Earthquake.hasMapCoordinates(): Boolean =

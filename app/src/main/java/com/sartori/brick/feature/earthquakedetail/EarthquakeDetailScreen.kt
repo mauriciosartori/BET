@@ -24,6 +24,7 @@ import com.sartori.brick.feature.earthquakelist.formatEarthquakeTime
 import com.sartori.brick.feature.earthquakelist.magnitudeColor
 import com.sartori.brick.feature.earthquakemap.EarthquakeMarkerBadge
 import com.sartori.brick.feature.earthquakemap.rememberEarthquakeMapStyle
+import com.sartori.brick.ui.theme.BrandOchre
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +66,14 @@ fun EarthquakeDetailScreen(
                     .verticalScroll(rememberScrollState()).padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                if (isFromOfflineCache) Text(stringResource(R.string.offline_data_message))
+                if (isFromOfflineCache) {
+                    Text(
+                        text = stringResource(R.string.offline_data_message),
+                        color = BrandOchre,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
 
                 Text(
                     earthquake.place ?: stringResource(R.string.unknown_location),
