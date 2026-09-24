@@ -5,7 +5,7 @@ Brick is a native Android application for exploring earthquakes reported by the 
 ## Features
 
 - Recent worldwide earthquakes from the USGS all-day GeoJSON feed.
-- A list with magnitude, location, local event time, visual magnitude ranges, and tsunami highlighting.
+- A list with magnitude, location, local event time, visual magnitude ranges, tsunami highlighting, and local sorting by newest or strongest event.
 - Pull-to-refresh with clear loading, empty, cached-data, and error states.
 - A full-screen map with marker clustering for dense areas.
 - Optional current-location context. If permission is granted, the map displays the standard location indicator and recenter button; the earthquake map remains usable if permission is denied or location is unavailable.
@@ -90,6 +90,8 @@ Google Maps tiles are managed separately by the Maps SDK and are not part of the
 
 Magnitude remains visible as a number and is reinforced by four presentation colors: green below 2.5, yellow from 2.5 through 4.4, orange from 4.5 through 5.9, and red from 6.0 upward. These are UI categories rather than an official damage scale. Events flagged by USGS for possible tsunami activity use a red card background independently of the magnitude color.
 
+The list can be sorted by `Latest` or `Strongest`, with `Latest` selected by default. Sorting is performed locally on the already loaded feed, so changing the option does not make another network request or modify the data shared with the map and detail screens. The selected option lives in the ViewModel state and survives refreshes and navigation.
+
 ## Assumptions and tradeoffs
 
 - “Recent” means the USGS `all_day.geojson` feed; the app does not combine multiple feed windows.
@@ -118,7 +120,8 @@ Automated tests cover:
 - Mapping a representative USGS response into the domain model.
 - Returning a stale cached response when a network request fails.
 - ViewModel initial loading and failed-refresh behavior, including preserving existing data.
-- Magnitude-band boundaries and parsing the region from USGS place descriptions.
+- Preserving the selected sort option across a refresh.
+- Latest/strongest ordering, magnitude-band boundaries, and parsing the region from USGS place descriptions.
 
 The current suite emphasizes deterministic data and state behavior. Map rendering, runtime permission dialogs, navigation gestures, and visual presentation are best checked manually because they depend on Android and Google Play services. Before submission, useful manual checks include accepting and denying location permission, navigating list → map → detail → back, selecting clusters at different zoom levels, refreshing online, and reopening previously viewed data without connectivity.
 
@@ -128,7 +131,7 @@ The current suite emphasizes deterministic data and state behavior. Map renderin
 - The HTTP cache can be evicted by Android and only accepts stale earthquake responses for seven days; durable offline storage would require a database.
 - Location is displayed as map context, but distances from the user are not calculated.
 - Events at identical coordinates may remain clustered at the highest zoom level. A cluster event picker could make those events individually selectable.
-- The app does not yet provide filtering, sorting controls, background updates, or notifications.
+- The app does not yet provide filtering, background updates, or notifications.
 - The automated suite does not currently include Compose UI or instrumentation tests.
 
 With more time, the next priorities would be distance-aware presentation, persistent storage for reliable offline access, focused Compose navigation tests, and filtering by magnitude or distance.
