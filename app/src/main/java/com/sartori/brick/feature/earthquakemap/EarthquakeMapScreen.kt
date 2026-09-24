@@ -1,11 +1,5 @@
 package com.sartori.brick.feature.earthquakemap
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,27 +11,18 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -47,11 +32,13 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.sartori.brick.data.earthquake.hasMapCoordinates
+import com.sartori.brick.ui.components.StatusMessage
+import com.sartori.brick.ui.components.StatusMessageTone
 import com.sartori.brick.R
 import com.sartori.brick.data.earthquake.Earthquake
 import com.sartori.brick.feature.earthquakelist.EarthquakeListError
 import com.sartori.brick.feature.earthquakelist.EarthquakeListUiState
-import com.sartori.brick.ui.theme.BrandOchre
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,12 +80,16 @@ fun EarthquakeMapScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (uiState.isFromOfflineCache) {
-                            MapNotice(
-                                message = stringResource(R.string.offline_data_message),
-                                tone = MapNoticeTone.OFFLINE
+                            StatusMessage(
+                                text = stringResource(R.string.offline_data_message),
+                                tone = StatusMessageTone.OFFLINE,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        if (events.size != uiState.earthquakes.size) MapNotice(stringResource(R.string.map_missing_coordinates))
+                        if (events.size != uiState.earthquakes.size) StatusMessage(
+                            text = stringResource(R.string.map_missing_coordinates),
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
@@ -109,34 +100,13 @@ fun EarthquakeMapScreen(
 @Composable
 @OptIn(MapsComposeExperimentalApi::class)
 private fun EarthquakeMarkers(events: List<Earthquake>, onEarthquakeClick: (String) -> Unit) {
-    val context = LocalContext.current
-    var hasLocationPermission by remember {
-        mutableStateOf(context.hasLocationPermission())
-    }
-    var permissionRequested by rememberSaveable { mutableStateOf(false) }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        hasLocationPermission = permissions.values.any { it }
-    }
+    val hasLocationPermission = rememberLocationPermission()
     val camera = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(39.8, -98.6), 3f)
     }
     val items = remember(events) { events.map { EarthquakeClusterItem(it) } }
     val scope = rememberCoroutineScope()
     val mapStyle = rememberEarthquakeMapStyle()
-
-    LaunchedEffect(Unit) {
-        if (!hasLocationPermission && !permissionRequested) {
-            permissionRequested = true
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-        }
-    }
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -190,44 +160,3 @@ private fun EarthquakeMarkers(events: List<Earthquake>, onEarthquakeClick: (Stri
         )
     }
 }
-
-@Composable
-private fun MapNotice(
-    message: String,
-    tone: MapNoticeTone = MapNoticeTone.INFO
-) {
-    val containerColor = when (tone) {
-        MapNoticeTone.INFO -> MaterialTheme.colorScheme.secondaryContainer
-        MapNoticeTone.OFFLINE -> MaterialTheme.colorScheme.tertiaryContainer
-    }
-    val borderColor = when (tone) {
-        MapNoticeTone.INFO -> MaterialTheme.colorScheme.secondary
-        MapNoticeTone.OFFLINE -> BrandOchre
-    }
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        color = containerColor,
-        border = BorderStroke(1.dp, borderColor.copy(alpha = 0.55f))
-    ) {
-        Text(message, Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
-private enum class MapNoticeTone {
-    INFO,
-    OFFLINE
-}
-
-internal fun Earthquake.hasMapCoordinates(): Boolean =
-    latitude != null && longitude != null && latitude.isFinite() && longitude.isFinite() &&
-        latitude in -90.0..90.0 && longitude in -180.0..180.0
-
-private fun Context.hasLocationPermission(): Boolean =
-    ContextCompat.checkSelfPermission(
-        this,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-        this,
-        Manifest.permission.ACCESS_COARSE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED

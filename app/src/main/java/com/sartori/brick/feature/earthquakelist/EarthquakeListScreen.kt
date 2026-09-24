@@ -24,11 +24,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,18 +39,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sartori.brick.ui.components.StatusMessage
+import com.sartori.brick.ui.components.StatusMessageTone
+import com.sartori.brick.ui.earthquake.formatEarthquakeTime
+import com.sartori.brick.ui.earthquake.magnitudeColor
+import com.sartori.brick.ui.earthquake.splitLocation
 import com.sartori.brick.R
 import com.sartori.brick.data.earthquake.Earthquake
 import com.sartori.brick.ui.theme.BrickTheme
-import com.sartori.brick.ui.theme.BrandOchre
-import com.sartori.brick.ui.theme.MagnitudeLow
-import com.sartori.brick.ui.theme.MagnitudeModerate
-import com.sartori.brick.ui.theme.MagnitudeSevere
-import com.sartori.brick.ui.theme.MagnitudeStrong
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 @Composable
 fun EarthquakeListScreen(
@@ -164,6 +160,9 @@ private fun EarthquakeList(
     onEarthquakeClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val sortedEarthquakes = remember(uiState.earthquakes, uiState.sortOption) {
+        uiState.earthquakes.sortedFor(uiState.sortOption)
+    }
     PullToRefreshBox(
         isRefreshing = uiState.isRefreshing,
         onRefresh = onRefresh,
@@ -197,7 +196,7 @@ private fun EarthquakeList(
             }
 
             items(
-                items = uiState.earthquakes.sortedFor(uiState.sortOption),
+                items = sortedEarthquakes,
                 key = Earthquake::id
             ) { earthquake ->
                 EarthquakeListItem(earthquake, onClick = { onEarthquakeClick(earthquake.id) })
@@ -229,32 +228,6 @@ private fun SortControls(
             selected = selectedOption == EarthquakeSortOption.STRONGEST,
             onClick = { onOptionSelected(EarthquakeSortOption.STRONGEST) },
             label = { Text(stringResource(R.string.sort_strongest)) }
-        )
-    }
-}
-
-@Composable
-private fun StatusMessage(
-    text: String,
-    tone: StatusMessageTone = StatusMessageTone.INFO
-) {
-    val containerColor = when (tone) {
-        StatusMessageTone.INFO -> MaterialTheme.colorScheme.secondaryContainer
-        StatusMessageTone.OFFLINE -> MaterialTheme.colorScheme.tertiaryContainer
-    }
-    val borderColor = when (tone) {
-        StatusMessageTone.INFO -> MaterialTheme.colorScheme.secondary
-        StatusMessageTone.OFFLINE -> BrandOchre
-    }
-    Surface(
-        color = containerColor,
-        shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(1.dp, borderColor.copy(alpha = 0.55f))
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(12.dp),
-            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
@@ -339,54 +312,6 @@ private fun EarthquakeListItem(earthquake: Earthquake, onClick: () -> Unit) {
     }
 }
 
-private enum class StatusMessageTone {
-    INFO,
-    OFFLINE
-}
-
-@Composable
-internal fun magnitudeColor(magnitude: Double?) = when (magnitudeLevel(magnitude)) {
-    MagnitudeLevel.UNKNOWN -> MaterialTheme.colorScheme.outline
-    MagnitudeLevel.GREEN -> MagnitudeLow
-    MagnitudeLevel.YELLOW -> MagnitudeModerate
-    MagnitudeLevel.ORANGE -> MagnitudeStrong
-    MagnitudeLevel.RED -> MagnitudeSevere
-}
-
-internal fun magnitudeLevel(magnitude: Double?): MagnitudeLevel = when {
-    magnitude == null -> MagnitudeLevel.UNKNOWN
-    magnitude < 2.5 -> MagnitudeLevel.GREEN
-    magnitude < 4.5 -> MagnitudeLevel.YELLOW
-    magnitude < 6.0 -> MagnitudeLevel.ORANGE
-    else -> MagnitudeLevel.RED
-}
-
-internal fun splitLocation(place: String?): EarthquakeLocation {
-    val normalizedPlace = place?.trim().orEmpty()
-    val separatorIndex = normalizedPlace.lastIndexOf(',')
-    if (separatorIndex <= 0 || separatorIndex == normalizedPlace.lastIndex) {
-        return EarthquakeLocation(region = null, description = normalizedPlace)
-    }
-
-    return EarthquakeLocation(
-        region = normalizedPlace.substring(separatorIndex + 1).trim(),
-        description = normalizedPlace.substring(0, separatorIndex).trim()
-    )
-}
-
-internal data class EarthquakeLocation(
-    val region: String?,
-    val description: String
-)
-
-internal enum class MagnitudeLevel {
-    UNKNOWN,
-    GREEN,
-    YELLOW,
-    ORANGE,
-    RED
-}
-
 internal fun List<Earthquake>.sortedFor(
     sortOption: EarthquakeSortOption
 ): List<Earthquake> = when (sortOption) {
@@ -402,10 +327,6 @@ internal fun List<Earthquake>.sortedFor(
             }
         )
 }
-
-internal fun formatEarthquakeTime(timeMillis: Long): String =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-        .format(Instant.ofEpochMilli(timeMillis).atZone(ZoneId.systemDefault()))
 
 @Preview(showBackground = true)
 @Composable

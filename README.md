@@ -64,6 +64,7 @@ Retrofit API + OkHttp HTTP cache
 - `data/earthquake/network` contains the Retrofit API and serializable USGS response models.
 - `data/earthquake` maps network models into the smaller domain model used by the UI. The repository interface allows the ViewModel to be tested with a fake implementation.
 - `feature/earthquakelist`, `feature/earthquakemap`, and `feature/earthquakedetail` contain the Compose UI for each feature.
+- `ui/earthquake` contains shared magnitude and location presentation helpers; `ui/components` contains the reusable status notice.
 - `EarthquakeListViewModel` owns the shared feed and exposes one immutable `StateFlow` snapshot containing data and transient UI conditions.
 - `EarthquakeNavHost` defines type-safe list, map, and detail destinations. Routes carry only the earthquake ID; the map and detail screens reuse the feed already held by the shared ViewModel instead of making another USGS request.
 - Hilt provides the repository, Retrofit, OkHttp, JSON parser, cache, and interceptor.
@@ -83,6 +84,8 @@ This keeps the solution proportional to the exercise while preserving previously
 The list and map use the same USGS feed. The map starts over the contiguous United States but continues to include worldwide events. Nearby markers are grouped by the clustering utility according to zoom level; selecting a cluster zooms in, and selecting an individual event opens its detail screen.
 
 Foreground location permission is requested only when the full-screen map opens. Granting approximate or precise location enables Google Maps' standard current-location indicator. Denying permission does not block earthquake exploration.
+
+Location permission is checked again when the map resumes, including after changes in Android Settings.
 
 Google Maps tiles are managed separately by the Maps SDK and are not part of the USGS HTTP cache.
 

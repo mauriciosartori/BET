@@ -1,6 +1,9 @@
 package com.sartori.brick.feature.earthquakelist
 
 import com.sartori.brick.data.earthquake.Earthquake
+import com.sartori.brick.ui.earthquake.MagnitudeLevel
+import com.sartori.brick.ui.earthquake.magnitudeLevel
+import com.sartori.brick.ui.earthquake.splitLocation
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

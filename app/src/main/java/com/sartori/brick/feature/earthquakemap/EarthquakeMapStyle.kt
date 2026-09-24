@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.sartori.brick.R
-import com.sartori.brick.feature.earthquakelist.MagnitudeLevel
-import com.sartori.brick.feature.earthquakelist.magnitudeColor
-import com.sartori.brick.feature.earthquakelist.magnitudeLevel
+import com.sartori.brick.ui.earthquake.MagnitudeLevel
+import com.sartori.brick.ui.earthquake.magnitudeColor
+import com.sartori.brick.ui.earthquake.magnitudeLevel
 import com.sartori.brick.ui.theme.Charcoal
 import java.util.Locale
 

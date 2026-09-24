@@ -17,3 +17,7 @@ data class EarthquakeFeed(
     val earthquakes: List<Earthquake>,
     val isFromOfflineCache: Boolean
 )
+
+internal fun Earthquake.hasMapCoordinates(): Boolean =
+    latitude != null && longitude != null && latitude.isFinite() && longitude.isFinite() &&
+        latitude in -90.0..90.0 && longitude in -180.0..180.0

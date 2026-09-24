@@ -25,9 +25,10 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.sartori.brick.R
+import com.sartori.brick.data.earthquake.hasMapCoordinates
 import com.sartori.brick.data.earthquake.Earthquake
-import com.sartori.brick.feature.earthquakelist.formatEarthquakeTime
-import com.sartori.brick.feature.earthquakelist.magnitudeColor
+import com.sartori.brick.ui.earthquake.formatEarthquakeTime
+import com.sartori.brick.ui.earthquake.magnitudeColor
 import com.sartori.brick.feature.earthquakemap.EarthquakeMarkerBadge
 import com.sartori.brick.feature.earthquakemap.rememberEarthquakeMapStyle
 import com.sartori.brick.ui.theme.BrandOchre
@@ -143,7 +144,7 @@ private fun EarthquakeMagnitude(earthquake: Earthquake) {
 }
 
 internal fun shouldShakeMagnitude(magnitude: Double?): Boolean =
-    magnitude != null && magnitude >= 4.5
+    magnitude != null && magnitude >= 5.0
 
 @Composable
 private fun EventDataSection(earthquake: Earthquake) {
@@ -191,9 +192,7 @@ private fun DetailField(label: String, value: String, modifier: Modifier = Modif
 private fun EarthquakeMap(earthquake: Earthquake) {
     val latitude = earthquake.latitude
     val longitude = earthquake.longitude
-    val validCoordinates = latitude != null && longitude != null &&
-        latitude.isFinite() && longitude.isFinite() && latitude in -90.0..90.0 && longitude in -180.0..180.0
-    if (!validCoordinates || stringResource(R.string.maps_api_key).isBlank()) {
+    if (!earthquake.hasMapCoordinates() || stringResource(R.string.maps_api_key).isBlank()) {
         Surface(
             modifier = Modifier.fillMaxWidth().height(220.dp),
             shape = MaterialTheme.shapes.medium,
