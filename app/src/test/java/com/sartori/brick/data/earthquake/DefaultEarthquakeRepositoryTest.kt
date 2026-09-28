@@ -43,8 +43,10 @@ class DefaultEarthquakeRepositoryTest {
         server.enqueue(MockResponse().setBody(USGS_RESPONSE))
 
         val feed = repository.getEarthquakes()
+        val request = server.takeRequest()
 
         assertFalse(feed.isFromOfflineCache)
+        assertEquals("no-cache", request.getHeader("Cache-Control"))
         assertEquals(1, feed.earthquakes.size)
         with(feed.earthquakes.single()) {
             assertEquals("test-earthquake", id)

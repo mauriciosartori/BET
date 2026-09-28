@@ -22,11 +22,11 @@ class EarthquakeListViewModel @Inject constructor(
     private var loadJob: Job? = null
 
     init {
-        loadEarthquakes(forceRefresh = true)
+        loadEarthquakes()
     }
 
     fun refresh() {
-        loadEarthquakes(forceRefresh = true)
+        loadEarthquakes()
     }
 
     fun selectSortOption(sortOption: EarthquakeSortOption) {
@@ -35,7 +35,7 @@ class EarthquakeListViewModel @Inject constructor(
         }
     }
 
-    private fun loadEarthquakes(forceRefresh: Boolean) {
+    private fun loadEarthquakes() {
         if (loadJob?.isActive == true) return
 
         loadJob = viewModelScope.launch {
@@ -56,7 +56,7 @@ class EarthquakeListViewModel @Inject constructor(
             }
 
             try {
-                val feed = repository.getEarthquakes(forceRefresh)
+                val feed = repository.getEarthquakes()
                 _uiState.update { currentState ->
                     currentState.copy(
                         earthquakes = feed.earthquakes,

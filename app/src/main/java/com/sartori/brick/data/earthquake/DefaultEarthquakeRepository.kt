@@ -8,9 +8,8 @@ import javax.inject.Inject
 class DefaultEarthquakeRepository @Inject constructor(
     private val api: EarthquakeApi
 ) : EarthquakeRepository {
-    override suspend fun getEarthquakes(forceRefresh: Boolean): EarthquakeFeed {
-        val cacheControl = if (forceRefresh) FORCE_REFRESH_CACHE_CONTROL else null
-        val response = api.getEarthquakes(cacheControl)
+    override suspend fun getEarthquakes(): EarthquakeFeed {
+        val response = api.getEarthquakes()
 
         if (!response.isSuccessful) {
             throw IOException("USGS request failed with HTTP ${response.code()}")
@@ -40,7 +39,6 @@ class DefaultEarthquakeRepository @Inject constructor(
     )
 
     private companion object {
-        const val FORCE_REFRESH_CACHE_CONTROL = "no-cache"
         const val LONGITUDE_INDEX = 0
         const val LATITUDE_INDEX = 1
         const val DEPTH_INDEX = 2

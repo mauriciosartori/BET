@@ -34,7 +34,7 @@ class EarthquakeListViewModelTest {
         assertFalse(viewModel.uiState.value.isInitialLoading)
         assertFalse(viewModel.uiState.value.isRefreshing)
         assertEquals(null, viewModel.uiState.value.error)
-        assertEquals(listOf(true), repository.forceRefreshValues)
+        assertEquals(1, repository.requestCount)
     }
 
     @Test
@@ -68,10 +68,11 @@ class EarthquakeListViewModelTest {
     private class FakeEarthquakeRepository(
         var result: Result<EarthquakeFeed>
     ) : EarthquakeRepository {
-        val forceRefreshValues = mutableListOf<Boolean>()
+        var requestCount = 0
+            private set
 
-        override suspend fun getEarthquakes(forceRefresh: Boolean): EarthquakeFeed {
-            forceRefreshValues += forceRefresh
+        override suspend fun getEarthquakes(): EarthquakeFeed {
+            requestCount++
             return result.getOrThrow()
         }
     }
